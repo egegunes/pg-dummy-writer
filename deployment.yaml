@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pg-dummy-writer
+  labels:
+    app: pg-dummy-writer
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: pg-dummy-writer
+  template:
+    metadata:
+      labels:
+        app: pg-dummy-writer
+    spec:
+      containers:
+      - name: writer
+        image: egegunes/pg-dummy-writer
+        env:
+        - name: PGUSER
+          valueFrom:
+            secretKeyRef:
+              name: cluster1-pguser-cluster1
+              key: user
+        - name: PGPASS
+          valueFrom:
+            secretKeyRef:
+              name: cluster1-pguser-cluster1
+              key: password
+        - name: PGHOST
+          valueFrom:
+            secretKeyRef:
+              name: cluster1-pguser-cluster1
+              key: host
+        command:
+        - ./pg-dummy-writer
+        args:
+        - -h
+        - $(PGHOST)
+        - -P
+        - '5432'
+        - -u
+        - $(PGUSER)
+        - -p
+        - $(PGPASS)
+        - -d
+        - sbtest
+        - -t
+        - sbtable
+        - -w
+        - '16'
+
