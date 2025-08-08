@@ -5,7 +5,7 @@ metadata:
   labels:
     app: pg-dummy-writer
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: pg-dummy-writer
@@ -16,23 +16,23 @@ spec:
     spec:
       containers:
       - name: writer
-        image: egegunes/pg-dummy-writer
+        image: docker.io/egegunes/pg-dummy-writer:1753096660
         env:
         - name: PGUSER
           valueFrom:
             secretKeyRef:
-              name: cluster1-pguser-cluster1
+              name: cluster1-pguser-appuser
               key: user
         - name: PGPASS
           valueFrom:
             secretKeyRef:
-              name: cluster1-pguser-cluster1
+              name: cluster1-pguser-appuser
               key: password
         - name: PGHOST
           valueFrom:
             secretKeyRef:
-              name: cluster1-pguser-cluster1
-              key: host
+              name: cluster1-pguser-appuser
+              key: pgbouncer-host
         command:
         - ./pg-dummy-writer
         args:
@@ -45,9 +45,11 @@ spec:
         - -p
         - $(PGPASS)
         - -d
-        - sbtest
+        - testdb1
         - -t
-        - sbtable
+        - testtbl1
         - -w
-        - '16'
+        - '2'
+        - -r
+        - '8'
 
